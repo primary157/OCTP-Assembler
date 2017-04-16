@@ -7,9 +7,8 @@ def readFile(filename):
         text_file = f.readlines() #le linhas separando-as em strings de um array
     return text_file    #retorna array
 def writeFile(filename,text_file):
-    text = '\n'.join(text_file) #junta todas as strings como sendo um texto de varias linhas
     with open(filename,'w') as f:   #abre arquivo em modo escrita
-        f.write(text)           #escreve texto no arquivo
+        f.writelines(text_file)           #escreve texto no arquivo
 def convertToBin(value):    
     if value[:2] == '0x':
         return str(bin(int(value[2:],16)))[2:]
@@ -32,6 +31,8 @@ Deve ser capaz de ler as instruções:
     sw reg,num(reg)
     lw rd, const(rt)
     sw rt, const(rd)
+    beq reg, reg, TAG
+    bne reg, reg, TAG
 
 
 
@@ -142,37 +143,33 @@ def decodeAsm(text_file):
             #instrucao do tipo j
             opcode = convertToBin(j_instructions[instruction[0]])
             address = convertToBin(instruction[1].rstrip('\n')) #endereço é o valor seguinte ao opcode convertido em texto binario
-            output += opcode.zfill(6) + " " + address.zfill(26) #saida recebe strings com tamanhos fixos completados com 0
+            output += opcode.zfill(6) + address.zfill(26) #saida recebe strings com tamanhos fixos completados com 0
         elif instruction[0] in i_instructions:
             #instrucao do tipo i
             opcode = convertToBin(i_instructions[instruction[0]])
             regs = instruction[1].split(',')
             regs[-1] = regs[-1].rstrip('\n')
-            output += opcode.zfill(6) + " "
-            if instruction[0] in ('andi','addi','ori'):
+            output += opcode.zfill(6)
+            if instruction[0] == 'lw':
+                output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5)  #rt Entrada
+                output += convertToBin(registers[regs[0]]).zfill(5)                                #rd Saida
+                output += convertToBin(regs[1].split('(',1)[0]).zfill(16)                          #const  offset
+            elif instruction[0] == 'sw':
+                output += convertToBin(registers[regs[0]]).zfill(5)                                 #rt Entrada
+                output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5)   #rd Saida
+                output += convertToBin(regs[1].split('(',1)[0]).zfill(16)                           #const  offset
+            else:
                 for j in regs:
                     if j in registers:
                         output += convertToBin(registers[j]).zfill(5)
                     else:
                         output += convertToBin(str(j)).zfill(16)
-                    output += " "
-            elif instruction[0] == 'lw':
-                output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5) + " "  #rt Entrada
-                output += convertToBin(registers[regs[0]]).zfill(5) + " "                                 #rd Saida
-                output += convertToBin(regs[1].split('(',1)[0]).zfill(16) + " "                            #const  offset
-            elif instruction[0] == 'sw':
-                output += convertToBin(registers[regs[0]]).zfill(5) + " "                                 #rt Entrada
-                output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5) + " "   #rd Saida
-                output += convertToBin(regs[1].split('(',1)[0]).zfill(16) + " "                            #const  offset
-            else:
-                #TODO: beq e bne eh diferente TRATAR ISSO
-                pass
         elif instruction[0] in r_instructions:
             #instrucao do tipo r
             regs = instruction[1].split(',')
             regs[-1] = regs[-1].rstrip('\n')
             #opcode é sempre 0 nas instrucoes do tipo r
-            output += "0".zfill(6) + " "
+            output += "0".zfill(6)
             jafoi = {
                     'rs': False,
                     'rt': False,
@@ -184,7 +181,6 @@ def decodeAsm(text_file):
                     if 'rs' in r_instructions[instruction[0]]['regs']:
                         output += convertToBin(registers[regs[j]]).zfill(5)
                         jafoi['rs'] = True
-                        output += " "
                         continue
                     else:
                         output += "0".zfill(5)
@@ -193,7 +189,6 @@ def decodeAsm(text_file):
                     if 'rt' in r_instructions[instruction[0]]['regs']:
                         output += convertToBin(registers[regs[j]]).zfill(5)
                         jafoi['rt'] = True
-                        output += " "
                         continue
                     else:
                         output += "0".zfill(5)
@@ -202,7 +197,6 @@ def decodeAsm(text_file):
                     if 'rd' in r_instructions[instruction[0]]['regs']:
                         output += convertToBin(registers[regs[j]]).zfill(5)
                         jafoi['rd'] = True
-                        output += " "
                         continue
                     else:
                         output += "0".zfill(5)
@@ -211,13 +205,11 @@ def decodeAsm(text_file):
                     if 'shamt' in r_instructions[instruction[0]]['regs']:
                         output += convertToBin(registers[regs[j]]).zfill(5)
                         jafoi['shamt'] = True
-                        output += " "
                         continue
                     else:
                         output += "0".zfill(5)
                         jafoi['shamt'] = True
-                output += " "
-            output += convertToBin(r_instructions[instruction[0]]['funct']).zfill(6) + " "
+            output += convertToBin(r_instructions[instruction[0]]['funct']).zfill(6)
         else:
             print("Tem algo errado filho!")
             return  "Montagem Falhou!\n"
