@@ -92,6 +92,10 @@ def decodeAsm(text_file):
                     'regs': ('rs')
                 }
             }
+    pseudo_instructions = [
+            "move",
+            "inc"
+            ]
     i_instructions = {
                 'addi' : '8',
                 'andi': '12',
@@ -139,6 +143,16 @@ def decodeAsm(text_file):
     output = ""
     for line in text_file:
         instruction = line.split(' ',1)
+        instruction[1] = "".join(instruction[1].split(' '))
+        if instruction[0] in pseudo_instructions:
+            if instruction[0] == pseudo_instructions[0]:
+                instruction[0] = 'add'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + ',$zero,' + regs[1]
+                pass #converte move em add
+            elif instruction[0] == pseudo_instructions[1]:
+                pass #converte inc em add
+            pass
         if instruction[0] in j_instructions:
             #instrucao do tipo j
             opcode = convertToBin(j_instructions[instruction[0]])
