@@ -217,7 +217,7 @@ def decodeAsm(text_file):
                         jafoi['rd'] = True
                 if not jafoi['shamt']:
                     if 'shamt' in r_instructions[instruction[0]]['regs']:
-                        output += convertToBin(registers[regs[j]]).zfill(5)
+                        output += convertToBin(regs[j]).zfill(5)
                         jafoi['shamt'] = True
                         continue
                     else:
