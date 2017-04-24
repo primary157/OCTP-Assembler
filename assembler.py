@@ -19,6 +19,22 @@ def convertToBin(value):
     else:
         return str(bin(int(value)))[2:]
 '''
+Deve ser capaz de ler as pseudointruçoes:
+
+move(moving) reg,reg OK
+multi(multiplicacao imediata) reg, reg, num
+blt(branch on less than) reg, reg, TAG 
+bgt(branch on greater than) reg, reg , TAG   
+ble(branch on less than or equal) reg, reg, TAG
+bge(branch on greater than or equal) reg, reg, TAG 
+sge(set if greater or equal) reg, reg, TAG 
+sgt(set greater than) reg, reg, TAG 
+clear(limpa) reg 
+neg(negative) reg,reg 
+not(negaçao) reg, reg 
+ror(rotacao direita) reg, reg, num 
+rol(rotacao esquerda) reg, reg, num 
+
 Deve ser capaz de ler as instruções:
     add reg,reg,reg
     add reg, reg, reg
@@ -92,9 +108,23 @@ def decodeAsm(text_file):
                     'regs': ('rs')
                 }
             }
+    rotulo = {}
     pseudo_instructions = [
             "move",
-            "inc"
+            "inc",
+            "multi",
+            "blt",
+            "bgt",
+            "ble",
+            "bge",
+            "sge",
+            "sgt",
+            "clear",
+            "neg",
+            "not",
+            "ror",
+            "rol",
+            "subi",
             ]
     i_instructions = {
                 'addi' : '8',
@@ -141,9 +171,27 @@ def decodeAsm(text_file):
             '$ra' : '31'
             }
     output = ""
+    n_linha = 0
     for line in text_file:
+        pega_rotulo = line.split(':',1)
+        n_linha += 1
+        rotulo[pega_rotulo[0]] = n_linha;
+
+        '''
+LOOP:add $s0,$s1,$s2
+     bne $s0,$s1,LOOP
+pega_rotulo = LOOP
+rotulo["LOOP"] = 1
+
+
+
+        '''
+    n_linha = 0
+    for line in text_file:
+        n_linha += 1
         instruction = line.split(' ',1)
         instruction[1] = "".join(instruction[1].split(' '))
+        repeticoes = 1
         if instruction[0] in pseudo_instructions:
             if instruction[0] == pseudo_instructions[0]:
                 instruction[0] = 'add'
@@ -151,81 +199,169 @@ def decodeAsm(text_file):
                 instruction[1] = regs[0] + ',$zero,' + regs[1]
                 pass #converte move em add
             elif instruction[0] == pseudo_instructions[1]:
+                  instruction[0] = 'add'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + ',$zero,' + '1'
                 pass #converte inc em add
-            pass
-        if instruction[0] in j_instructions:
-            #instrucao do tipo j
-            opcode = convertToBin(j_instructions[instruction[0]])
-            address = convertToBin(instruction[1].rstrip('\n')) #endereço é o valor seguinte ao opcode convertido em texto binario
-            output += opcode.zfill(6) + address.zfill(26) #saida recebe strings com tamanhos fixos completados com 0
-        elif instruction[0] in i_instructions:
-            #instrucao do tipo i
-            opcode = convertToBin(i_instructions[instruction[0]])
-            regs = instruction[1].split(',')
-            regs[-1] = regs[-1].rstrip('\n')
-            output += opcode.zfill(6)
-            if instruction[0] == 'lw':
-                output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5)  #rt Entrada
-                output += convertToBin(registers[regs[0]]).zfill(5)                                #rd Saida
-                output += convertToBin(regs[1].split('(',1)[0]).zfill(16)                          #const  offset
-            elif instruction[0] == 'sw':
-                output += convertToBin(registers[regs[0]]).zfill(5)                                 #rt Entrada
-                output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5)   #rd Saida
-                output += convertToBin(regs[1].split('(',1)[0]).zfill(16)                           #const  offset
+            elif intruction[0] == pseudo_instructions[2]:
+                  instruction[0] = 'sll'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + str(int(regs[2])*2)
+                pass #converte multi em sll
+            elif instruction[0] == pseudo_instructions[3]:
+                  instruction[0] = 'slt'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + regs[2]
+                  instruction[2] = 'bne'
+                  instruction[3] = regs[0] + ',$zero,' + regs[2]
+                pass #converte blt em slt e bne
+            elif instruction[0] == pseudo_instructions[4]:
+                  instruction[0] = 'slt'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + regs[2]
+                  instruction[2] = 'bne'
+                  instruction[3] = regs[0] + ',$zero,' + regs[2]
+                pass #converte bgt em slt e bne
+            elif instruction[0] == pseudo_instructions[5]:
+                  instruction[0] = 'slt'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + regs[2]
+                  instruction[2] = 'beq'
+                  instruction[3] = regs[0] + ',$zero,' + regs[2]
+                pass #converte ble em slt e beq
+            elif instruction[0] == pseudo_instructions[6]:
+                  instruction[0] = 'slt'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + regs[2]
+                  instruction[2] = 'beq'
+                  instruction[3] = regs[0] + ',$zero,' + regs[2]
+                pass #converte bge em slt e beq
+            elif instruction[0] == pseudo_instructions[7]:
+                  instruction[0] = 'slt'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + regs[2]
+                  instruction[2] = 'beq'
+                  instruction[3] = regs[0] + ',$zero,' + regs[2]
+                pass #converte sge em slt e beq
+            elif instruction[0] == pseudo_instructions[8]:
+                  instruction[0] = 'slt'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + regs[2]
+                pass #converte sgt em slt
+            elif instruction[0] == pseudo_instructions[9]:
+                  instruction[0] = 'add'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + ',$zero,' + '$zero'
+                pass #clear
+            elif instruction[0] == pseudo_instructions[10]:
+                  instruction[0] = 'sub'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + ',$zero,' + regs[1]
+                pass #converte neg em sub
+            elif instruction[0] == pseudo_instructions[11]:
+                  instruction[0] = 'add'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + regs[1] + '$zero'
+                pass #converte not em nor
+            elif instruction[0] == pseudo_instructions[12]:
+                   instruction[0] = 'sll'
+                   regs = instruction[1].split(',')
+                   instruction[1] = regs[0] + regs[1] + regs[2]
+                   instruction[2] = 'srl'
+                   instruction[3] = regs[0] + regs[1] + regs[2]
+                   instruction[4] = 'or'
+                   instruction[5] = regs[0] + regs[1] + regs[2]
+                pass #converte ror em sll srl e or
+             elif instruction[0] == pseudo_instructions[12]:
+                   instruction[0] = 'srl'
+                   regs = instruction[1].split(',')
+                   instruction[1] = regs[0] + regs[1] + regs[2]
+                   instruction[2] = 'sll'
+                   instruction[3] = regs[0] + regs[1] + regs[2]
+                   instruction[4] = 'or'
+                   instruction[5] = regs[0] + regs[1] + regs[2]
+                   repeticoes = 3
+                pass #converte ror em srl sll e or
+             elif instruction[0] = pseudo_instructions[13]:
+                  instruction[0] = 'addi'
+                  regs = instruction[1].split(',')
+                  instruction[1] = regs[0] + ',$zero, -' + regs[1]
+        for i in range(0,repeticoes-1):
+            if instruction[0+(i*2)] in j_instructions:        #instruction[x] vai virar instruction[x+(i*2)]
+                #instrucao do tipo j
+                opcode = convertToBin(j_instructions[instruction[0+(i*2)]])
+                address = convertToBin(str(rotulo[instruction[1+(i*2)].rstrip('\n')])) #endereço é o rotulo convertido em texto binario
+                output += opcode.zfill(6) + address.zfill(26) #saida recebe strings com tamanhos fixos completados com 0
+            elif instruction[0+(i*2)] in i_instructions:
+                #instrucao do tipo i
+                opcode = convertToBin(i_instructions[instruction[0+(i*2)]])
+                regs = instruction[1+(i*2)].split(',')
+                regs[-1] = regs[-1].rstrip('\n')
+                output += opcode.zfill(6)
+                if instruction[0+(i*2)] == 'lw':
+                    output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5)  #rt Entrada
+                    output += convertToBin(registers[regs[0]]).zfill(5)                                #rd Saida
+                    output += convertToBin(regs[1].split('(',1)[0]).zfill(16)                          #const  offset
+                elif instruction[0+(i*2)] == 'sw':
+                    output += convertToBin(registers[regs[0]]).zfill(5)                                 #rt Entrada
+                    output += convertToBin(registers[regs[1].split('(',1)[1].rstrip(')\n')]).zfill(5)   #rd Saida
+                    output += convertToBin(regs[1].split('(',1)[0]).zfill(16)                           #const  offset
+                else:
+                    for j in regs:
+                        if j in registers:
+                            output += convertToBin(registers[j]).zfill(5)
+                        else:
+                            if instruction[0+(i*2)] == 'bne' or  instruction[0+(i*2)] == 'beq': #se j é rótulo
+                                j = rotulo[j]-(n_linha+i)                                       #j vira um numero referente a distancia da linha atual
+                            output += convertToBin(str(j)).zfill(16)
+            elif instruction[0+(i*2)] in r_instructions:
+                #instrucao do tipo r
+                regs = instruction[1+(i*2)].split(',')
+                regs[-1] = regs[-1].rstrip('\n')
+                #opcode é sempre 0 nas instrucoes do tipo r
+                output += "0".zfill(6)
+                jafoi = {
+                        'rs': False,
+                        'rt': False,
+                        'rd': False,
+                        'shamt': False
+                        }
+                for j in range(4):
+                    if not jafoi['rs']:
+                        if 'rs' in r_instructions[instruction[0+(i*2)]]['regs']:
+                            output += convertToBin(registers[regs[j]]).zfill(5)
+                            jafoi['rs'] = True
+                            continue
+                        else:
+                            output += "0".zfill(5)
+                            jafoi['rs'] = True
+                    if not jafoi['rt']:
+                        if 'rt' in r_instructions[instruction[0+(i*2)]]['regs']:
+                            output += convertToBin(registers[regs[j]]).zfill(5)
+                            jafoi['rt'] = True
+                            continue
+                        else:
+                            output += "0".zfill(5)
+                            jafoi['rt'] = True
+                    if not jafoi['rd']:
+                        if 'rd' in r_instructions[instruction[0+(i*2)]]['regs']:
+                            output += convertToBin(registers[regs[j]]).zfill(5)
+                            jafoi['rd'] = True
+                            continue
+                        else:
+                            output += "0".zfill(5)
+                            jafoi['rd'] = True
+                    if not jafoi['shamt']:
+                        if 'shamt' in r_instructions[instruction[0+(i*2)]]['regs']:
+                            output += convertToBin(regs[j]).zfill(5)
+                            jafoi['shamt'] = True
+                            continue
+                        else:
+                            output += "0".zfill(5)
+                            jafoi['shamt'] = True
+                output += convertToBin(r_instructions[instruction[0+(i*2)]]['funct']).zfill(6)
             else:
-                for j in regs:
-                    if j in registers:
-                        output += convertToBin(registers[j]).zfill(5)
-                    else:
-                        output += convertToBin(str(j)).zfill(16)
-        elif instruction[0] in r_instructions:
-            #instrucao do tipo r
-            regs = instruction[1].split(',')
-            regs[-1] = regs[-1].rstrip('\n')
-            #opcode é sempre 0 nas instrucoes do tipo r
-            output += "0".zfill(6)
-            jafoi = {
-                    'rs': False,
-                    'rt': False,
-                    'rd': False,
-                    'shamt': False
-                    }
-            for j in range(4):
-                if not jafoi['rs']:
-                    if 'rs' in r_instructions[instruction[0]]['regs']:
-                        output += convertToBin(registers[regs[j]]).zfill(5)
-                        jafoi['rs'] = True
-                        continue
-                    else:
-                        output += "0".zfill(5)
-                        jafoi['rs'] = True
-                if not jafoi['rt']:
-                    if 'rt' in r_instructions[instruction[0]]['regs']:
-                        output += convertToBin(registers[regs[j]]).zfill(5)
-                        jafoi['rt'] = True
-                        continue
-                    else:
-                        output += "0".zfill(5)
-                        jafoi['rt'] = True
-                if not jafoi['rd']:
-                    if 'rd' in r_instructions[instruction[0]]['regs']:
-                        output += convertToBin(registers[regs[j]]).zfill(5)
-                        jafoi['rd'] = True
-                        continue
-                    else:
-                        output += "0".zfill(5)
-                        jafoi['rd'] = True
-                if not jafoi['shamt']:
-                    if 'shamt' in r_instructions[instruction[0]]['regs']:
-                        output += convertToBin(regs[j]).zfill(5)
-                        jafoi['shamt'] = True
-                        continue
-                    else:
-                        output += "0".zfill(5)
-                        jafoi['shamt'] = True
-            output += convertToBin(r_instructions[instruction[0]]['funct']).zfill(6)
-        else:
-            print("Tem algo errado filho!")
-            return  "Montagem Falhou!\n"
-        output += '\n'  #fim de uma instrução
+                print("Tem algo errado filho!")
+                return  "Montagem Falhou!\n"
+            output += '\n'  #fim de uma instrução
     return output
