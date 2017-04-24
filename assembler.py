@@ -1,5 +1,5 @@
 '''
-Esse programa foi desenvolvido pela dubpla: Victor Guerra Veloso(2658) e Athena Sarantôpoulos().
+Esse programa foi desenvolvido pela dubpla: Victor Guerra Veloso(2658) e Athena Sarantôpoulos(2652).
 '''
 def readFile(filename):
     text_file = []  #array de strings
@@ -197,16 +197,19 @@ rotulo["LOOP"] = 1
                 instruction[0] = 'add'
                 regs = instruction[1].split(',')
                 instruction[1] = regs[0] + ',$zero,' + regs[1]
+                repeticoes = 1
                 pass #converte move em add
             elif instruction[0] == pseudo_instructions[1]:
                   instruction[0] = 'add'
                   regs = instruction[1].split(',')
                   instruction[1] = regs[0] + ',$zero,' + '1'
+                  repeticoes = 1
                 pass #converte inc em add
             elif intruction[0] == pseudo_instructions[2]:
                   instruction[0] = 'sll'
                   regs = instruction[1].split(',')
                   instruction[1] = regs[0] + regs[1] + str(int(regs[2])*2)
+                  repeticoes = 1
                 pass #converte multi em sll
             elif instruction[0] == pseudo_instructions[3]:
                   instruction[0] = 'slt'
@@ -214,6 +217,7 @@ rotulo["LOOP"] = 1
                   instruction[1] = regs[0] + regs[1] + regs[2]
                   instruction[2] = 'bne'
                   instruction[3] = regs[0] + ',$zero,' + regs[2]
+                  repeticoes = 2
                 pass #converte blt em slt e bne
             elif instruction[0] == pseudo_instructions[4]:
                   instruction[0] = 'slt'
@@ -221,6 +225,7 @@ rotulo["LOOP"] = 1
                   instruction[1] = regs[0] + regs[1] + regs[2]
                   instruction[2] = 'bne'
                   instruction[3] = regs[0] + ',$zero,' + regs[2]
+                  repeticoes = 2
                 pass #converte bgt em slt e bne
             elif instruction[0] == pseudo_instructions[5]:
                   instruction[0] = 'slt'
@@ -228,6 +233,7 @@ rotulo["LOOP"] = 1
                   instruction[1] = regs[0] + regs[1] + regs[2]
                   instruction[2] = 'beq'
                   instruction[3] = regs[0] + ',$zero,' + regs[2]
+                  repeticoes = 2
                 pass #converte ble em slt e beq
             elif instruction[0] == pseudo_instructions[6]:
                   instruction[0] = 'slt'
@@ -242,6 +248,7 @@ rotulo["LOOP"] = 1
                   instruction[1] = regs[0] + regs[1] + regs[2]
                   instruction[2] = 'beq'
                   instruction[3] = regs[0] + ',$zero,' + regs[2]
+                  repeticoes = 2
                 pass #converte sge em slt e beq
             elif instruction[0] == pseudo_instructions[8]:
                   instruction[0] = 'slt'
@@ -252,16 +259,19 @@ rotulo["LOOP"] = 1
                   instruction[0] = 'add'
                   regs = instruction[1].split(',')
                   instruction[1] = regs[0] + ',$zero,' + '$zero'
+                  repeticoes = 1
                 pass #clear
             elif instruction[0] == pseudo_instructions[10]:
                   instruction[0] = 'sub'
                   regs = instruction[1].split(',')
                   instruction[1] = regs[0] + ',$zero,' + regs[1]
+                  repeticoes = 1
                 pass #converte neg em sub
             elif instruction[0] == pseudo_instructions[11]:
                   instruction[0] = 'add'
                   regs = instruction[1].split(',')
                   instruction[1] = regs[0] + regs[1] + '$zero'
+                  repeticoes = 1
                 pass #converte not em nor
             elif instruction[0] == pseudo_instructions[12]:
                    instruction[0] = 'sll'
@@ -271,6 +281,7 @@ rotulo["LOOP"] = 1
                    instruction[3] = regs[0] + regs[1] + regs[2]
                    instruction[4] = 'or'
                    instruction[5] = regs[0] + regs[1] + regs[2]
+                   repeticoes = 3
                 pass #converte ror em sll srl e or
              elif instruction[0] == pseudo_instructions[12]:
                    instruction[0] = 'srl'
@@ -286,6 +297,7 @@ rotulo["LOOP"] = 1
                   instruction[0] = 'addi'
                   regs = instruction[1].split(',')
                   instruction[1] = regs[0] + ',$zero, -' + regs[1]
+                  repeticoes = 1
         for i in range(0,repeticoes-1):
             if instruction[0+(i*2)] in j_instructions:        #instruction[x] vai virar instruction[x+(i*2)]
                 #instrucao do tipo j
