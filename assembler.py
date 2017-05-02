@@ -381,4 +381,4 @@ rotulo["LOOP"] = 1
                 print("Tem algo errado filho!")
                 return  "Montagem Falhou!\n"
             output += '\n'  #fim de uma instrução
-return output
+    return output
