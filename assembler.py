@@ -172,12 +172,18 @@ def decodeAsm(text_file):
             }
     output = ""
     n_linha = 0
+    real_text_file = []
     for line in text_file:
-        pega_rotulo = line.split(':',1)
         n_linha += 1
-        rotulo[pega_rotulo[0]] = n_linha;
-
-        '''
+        pega_rotulo = line.split(':',1)
+        try:
+            line = pega_rotulo[1]
+            rotulo[pega_rotulo[0]] = n_linha;
+        except IndexError:
+            real_text_file.append(line)
+        else:
+            real_text_file.append(pega_rotulo[1].lstrip(' '))
+    '''
 LOOP:add $s0,$s1,$s2
      bne $s0,$s1,LOOP
 pega_rotulo = LOOP
@@ -185,9 +191,9 @@ rotulo["LOOP"] = 1
 
 
 
-        '''
+    '''
     n_linha = 0
-    for line in text_file:
+    for line in real_text_file:
         n_linha += 1
         instruction = line.split(' ',1)
         instruction[1] = "".join(instruction[1].split(' '))
@@ -198,107 +204,107 @@ rotulo["LOOP"] = 1
                 regs = instruction[1].split(',')
                 instruction[1] = regs[0] + ',$zero,' + regs[1]
                 repeticoes = 1
-                pass #converte move em add
+                #converte move em add
             elif instruction[0] == pseudo_instructions[1]:
-                  instruction[0] = 'add'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + ',$zero,' + '1'
-                  repeticoes = 1
-                pass #converte inc em add
+                instruction[0] = 'add'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + ',$zero,' + '1'
+                repeticoes = 1
+                #converte inc em add
             elif intruction[0] == pseudo_instructions[2]:
-                  instruction[0] = 'sll'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + str(int(regs[2])*2)
-                  repeticoes = 1
-                pass #converte multi em sll
+                instruction[0] = 'sll'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + str(int(regs[2])*2)
+                repeticoes = 1
+                #converte multi em sll
             elif instruction[0] == pseudo_instructions[3]:
-                  instruction[0] = 'slt'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + regs[2]
-                  instruction[2] = 'bne'
-                  instruction[3] = regs[0] + ',$zero,' + regs[2]
-                  repeticoes = 2
-                pass #converte blt em slt e bne
+                instruction[0] = 'slt'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + regs[2]
+                instruction[2] = 'bne'
+                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                repeticoes = 2
+                #converte blt em slt e bne
             elif instruction[0] == pseudo_instructions[4]:
-                  instruction[0] = 'slt'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + regs[2]
-                  instruction[2] = 'bne'
-                  instruction[3] = regs[0] + ',$zero,' + regs[2]
-                  repeticoes = 2
-                pass #converte bgt em slt e bne
+                instruction[0] = 'slt'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + regs[2]
+                instruction[2] = 'bne'
+                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                repeticoes = 2
+                #converte bgt em slt e bne
             elif instruction[0] == pseudo_instructions[5]:
-                  instruction[0] = 'slt'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + regs[2]
-                  instruction[2] = 'beq'
-                  instruction[3] = regs[0] + ',$zero,' + regs[2]
-                  repeticoes = 2
-                pass #converte ble em slt e beq
+                instruction[0] = 'slt'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + regs[2]
+                instruction[2] = 'beq'
+                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                repeticoes = 2
+                #converte ble em slt e beq
             elif instruction[0] == pseudo_instructions[6]:
-                  instruction[0] = 'slt'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + regs[2]
-                  instruction[2] = 'beq'
-                  instruction[3] = regs[0] + ',$zero,' + regs[2]
-                pass #converte bge em slt e beq
+                instruction[0] = 'slt'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + regs[2]
+                instruction[2] = 'beq'
+                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                #converte bge em slt e beq
             elif instruction[0] == pseudo_instructions[7]:
-                  instruction[0] = 'slt'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + regs[2]
-                  instruction[2] = 'beq'
-                  instruction[3] = regs[0] + ',$zero,' + regs[2]
-                  repeticoes = 2
-                pass #converte sge em slt e beq
+                instruction[0] = 'slt'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + regs[2]
+                instruction[2] = 'beq'
+                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                repeticoes = 2
+                #converte sge em slt e beq
             elif instruction[0] == pseudo_instructions[8]:
-                  instruction[0] = 'slt'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + regs[2]
-                pass #converte sgt em slt
+                instruction[0] = 'slt'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + regs[2]
+                #converte sgt em slt
             elif instruction[0] == pseudo_instructions[9]:
-                  instruction[0] = 'add'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + ',$zero,' + '$zero'
-                  repeticoes = 1
-                pass #clear
+                 instruction[0] = 'add'
+                 regs = instruction[1].split(',')
+                 instruction[1] = regs[0] + ',$zero,' + '$zero'
+                 repeticoes = 1
+                 #clear
             elif instruction[0] == pseudo_instructions[10]:
-                  instruction[0] = 'sub'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + ',$zero,' + regs[1]
-                  repeticoes = 1
-                pass #converte neg em sub
+                 instruction[0] = 'sub'
+                 regs = instruction[1].split(',')
+                 instruction[1] = regs[0] + ',$zero,' + regs[1]
+                 repeticoes = 1
+                 #converte neg em sub
             elif instruction[0] == pseudo_instructions[11]:
-                  instruction[0] = 'add'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + regs[1] + '$zero'
-                  repeticoes = 1
-                pass #converte not em nor
+                 instruction[0] = 'add'
+                 regs = instruction[1].split(',')
+                 instruction[1] = regs[0] + regs[1] + '$zero'
+                 repeticoes = 1
+                 #converte not em nor
             elif instruction[0] == pseudo_instructions[12]:
-                   instruction[0] = 'sll'
-                   regs = instruction[1].split(',')
-                   instruction[1] = regs[0] + regs[1] + regs[2]
-                   instruction[2] = 'srl'
-                   instruction[3] = regs[0] + regs[1] + regs[2]
-                   instruction[4] = 'or'
-                   instruction[5] = regs[0] + regs[1] + regs[2]
-                   repeticoes = 3
-                pass #converte ror em sll srl e or
-             elif instruction[0] == pseudo_instructions[12]:
-                   instruction[0] = 'srl'
-                   regs = instruction[1].split(',')
-                   instruction[1] = regs[0] + regs[1] + regs[2]
-                   instruction[2] = 'sll'
-                   instruction[3] = regs[0] + regs[1] + regs[2]
-                   instruction[4] = 'or'
-                   instruction[5] = regs[0] + regs[1] + regs[2]
-                   repeticoes = 3
-                pass #converte ror em srl sll e or
-             elif instruction[0] = pseudo_instructions[13]:
-                  instruction[0] = 'addi'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + ',$zero, -' + regs[1]
-                  repeticoes = 1
-        for i in range(0,repeticoes-1):
+                 instruction[0] = 'sll'
+                 regs = instruction[1].split(',')
+                 instruction[1] = regs[0] + regs[1] + regs[2]
+                 instruction[2] = 'srl'
+                 instruction[3] = regs[0] + regs[1] + regs[2]
+                 instruction[4] = 'or'
+                 instruction[5] = regs[0] + regs[1] + regs[2]
+                 repeticoes = 3
+                 #converte ror em sll srl e or
+            elif instruction[0] == pseudo_instructions[13]:
+                instruction[0] = 'srl'
+                regs = instruction[1].split(',')
+                instruction[1] = regs[0] + regs[1] + regs[2]
+                instruction[2] = 'sll'
+                instruction[3] = regs[0] + regs[1] + regs[2]
+                instruction[4] = 'or'
+                instruction[5] = regs[0] + regs[1] + regs[2]
+                repeticoes = 3
+                #converte ror em srl sll e or
+            elif instruction[0] == pseudo_instructions[14]:
+                 instruction[0] = 'addi'
+                 regs = instruction[1].split(',')
+                 instruction[1] = regs[0] + ',$zero, -' + regs[1]
+                 repeticoes = 1
+        for i in range(0,repeticoes):
             if instruction[0+(i*2)] in j_instructions:        #instruction[x] vai virar instruction[x+(i*2)]
                 #instrucao do tipo j
                 opcode = convertToBin(j_instructions[instruction[0+(i*2)]])
