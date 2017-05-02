@@ -203,9 +203,9 @@ rotulo["LOOP"] = 1
                 repeticoes = 1
                 #converte move em add
             elif instruction[0] == pseudo_instructions[1]:
-                instruction[0] = 'add'
-                regs = instruction[1].split(',')
-                instruction[1] = regs[0] + ',$zero,' + '1'
+                instruction[0] = 'addi'
+                regs = instruction[1]
+                instruction[1] = regs.rstrip('\n') + ',$zero,' + '1'
                 repeticoes = 1
                 #converte inc em add
             elif instruction[0] == pseudo_instructions[2]:
@@ -260,8 +260,8 @@ rotulo["LOOP"] = 1
                 #converte sgt em slt
             elif instruction[0] == pseudo_instructions[9]:
                  instruction[0] = 'add'
-                 regs = instruction[1].split(',')
-                 instruction[1] = regs[0] + ',$zero,$zero'
+                 regs = instruction[1]
+                 instruction[1] = regs.rstrip('\n') + ',$zero,$zero'
                  repeticoes = 1
                  #clear
             elif instruction[0] == pseudo_instructions[10]:
