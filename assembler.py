@@ -14,13 +14,13 @@ def writeFile(filename,text_file):
 def convertToBin(value):
     if value[:1] == '-':
         if value[:3] == '-0x':
-            return ('-'+str(bin(int(value[2:],16)))[3:])
+            return (str(bin(-int(value[3:],16)))[3:])
         elif value[:3] == '-0b':
-            return ('-'+value[3:])
+            return (str(bin(-int(value[3:],2)))[3:])
         elif value[:3] == '-00':
-            return ('-'+str(bin(int(value[2:],8)))[3:])
+            return (str(bin(-int(value[3:],8)))[3:])
         else:
-            return ('-'+str(bin(int(value)))[3:])
+            return (str(bin(-int(value[1:])))[3:])
     if value[:2] == '0x':
         return str(bin(int(value[2:],16)))[2:]
     elif value[:2] == '0b':
