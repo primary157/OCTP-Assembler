@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #-*-coding: utf-8-*-
 '''
-Esse programa foi desenvolvido pela dubpla: Victor Guerra Veloso(2658) e Athena Sarantôpoulos(2652).
+Esse programa foi desenvolvido pela dupla: Victor Guerra Veloso(2658) e Athena Sarantôpoulos(2652).
 '''
 def readFile(filename):
     text_file = []  #array de strings
@@ -31,7 +31,6 @@ def convertToBin(value):
         return str(bin(int(value)))[2:]
 '''
 Deve ser capaz de ler as pseudointruçoes:
-
 move(moving) reg,reg OK
 multi(multiplicacao imediata) reg, reg, num
 blt(branch on less than) reg, reg, TAG 
@@ -45,7 +44,6 @@ neg(negative) reg,reg
 not(negaçao) reg, reg 
 ror(rotacao direita) reg, reg, num 
 rol(rotacao esquerda) reg, reg, num 
-
 Deve ser capaz de ler as instruções:
     add reg,reg,reg
     add reg, reg, reg
@@ -60,11 +58,6 @@ Deve ser capaz de ler as instruções:
     sw rt, const(rd)
     beq reg, reg, TAG
     bne reg, reg, TAG
-
-
-
-
-
 Precisa ser compativel com instruções R:
 meaning    op  rs  rt  rd  shamt   funct
 bitsnum    6   5   5   5   5       6
@@ -74,10 +67,6 @@ bitsnum    6   5   5   16
 Precisa ser compatível com instruções J:
 meaning    op  const/address
 bitsnum    6   26
-
-
-
-
 '''
 
 def decodeAsm(text_file):
@@ -199,9 +188,6 @@ LOOP:add $s0,$s1,$s2
      bne $s0,$s1,LOOP
 pega_rotulo = LOOP
 rotulo["LOOP"] = 1
-
-
-
     '''
     n_linha = 0
     for line in real_text_file:
@@ -239,32 +225,32 @@ rotulo["LOOP"] = 1
             elif instruction[0] == pseudo_instructions[4]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
-                instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction.append('bne')
-                instruction.append(regs[0] + ',$zero,' + regs[2])
+                instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
+                instruction[2] = 'bne'
+                instruction[3] = '$t7,$zero,' + regs[2]
                 repeticoes = 2
                 #converte bgt em slt e bne
             elif instruction[0] == pseudo_instructions[5]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
-                instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction.append('beq')
-                instruction.append(regs[0] + ',$zero,' + regs[2])
+                instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
+                instruction[2] = 'beq'
+                instruction[3] = '$t7,$zero,' + regs[2]
                 repeticoes = 2
                 #converte ble em slt e beq
             elif instruction[0] == pseudo_instructions[6]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
-                instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction.append('beq')
-                instruction.append(regs[0] + ',$zero,' + regs[2])
+                instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
+                instruction[2] = 'beq'
+                instruction[3] = '$t7,$zero,'  + regs[2]
                 #converte bge em slt e beq
             elif instruction[0] == pseudo_instructions[7]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
-                instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction.append('beq')
-                instruction.append(regs[0] + ',$zero,' + regs[2])
+                instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
+                instruction[2] = 'beq'
+                instruction[3] = '$t7,$zero,' + regs[2]
                 repeticoes = 2
                 #converte sge em slt e beq
             elif instruction[0] == pseudo_instructions[8]:
@@ -395,4 +381,4 @@ rotulo["LOOP"] = 1
                 print("Tem algo errado filho!")
                 return  "Montagem Falhou!\n"
             output += '\n'  #fim de uma instrução
-    return output
+return output
