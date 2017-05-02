@@ -9,7 +9,16 @@ def readFile(filename):
 def writeFile(filename,text_file):
     with open(filename,'w') as f:   #abre arquivo em modo escrita
         f.writelines(text_file)           #escreve texto no arquivo
-def convertToBin(value):    
+def convertToBin(value):
+    if value[:1] == '-':
+        if value[:3] == '-0x':
+            return ('-'+str(bin(int(value[2:],16)))[3:])
+        elif value[:3] == '-0b':
+            return ('-'+value[3:])
+        elif value[:3] == '-00':
+            return ('-'+str(bin(int(value[2:],8)))[3:])
+        else:
+            return ('-'+str(bin(int(value)))[3:])
     if value[:2] == '0x':
         return str(bin(int(value[2:],16)))[2:]
     elif value[:2] == '0b':
@@ -220,40 +229,40 @@ rotulo["LOOP"] = 1
             elif instruction[0] == pseudo_instructions[3]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
-                instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction[2] = 'bne'
-                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                instruction[1] = "$t7," + regs[0] + "," + regs[1]
+                instruction.append('bne')
+                instruction.append('$t7,$zero,' + regs[2])
                 repeticoes = 2
                 #converte blt em slt e bne
             elif instruction[0] == pseudo_instructions[4]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction[2] = 'bne'
-                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                instruction.append('bne')
+                instruction.append(regs[0] + ',$zero,' + regs[2])
                 repeticoes = 2
                 #converte bgt em slt e bne
             elif instruction[0] == pseudo_instructions[5]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction[2] = 'beq'
-                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                instruction.append('beq')
+                instruction.append(regs[0] + ',$zero,' + regs[2])
                 repeticoes = 2
                 #converte ble em slt e beq
             elif instruction[0] == pseudo_instructions[6]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction[2] = 'beq'
-                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                instruction.append('beq')
+                instruction.append(regs[0] + ',$zero,' + regs[2])
                 #converte bge em slt e beq
             elif instruction[0] == pseudo_instructions[7]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction[2] = 'beq'
-                instruction[3] = regs[0] + ',$zero,' + regs[2]
+                instruction.append('beq')
+                instruction.append(regs[0] + ',$zero,' + regs[2])
                 repeticoes = 2
                 #converte sge em slt e beq
             elif instruction[0] == pseudo_instructions[8]:
@@ -283,20 +292,20 @@ rotulo["LOOP"] = 1
                  instruction[0] = 'sll'
                  regs = instruction[1].split(',')
                  instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                 instruction[2] = 'srl'
-                 instruction[3] = regs[0] + "," + regs[1] + "," + regs[2]
-                 instruction[4] = 'or'
-                 instruction[5] = regs[0] + "," + regs[1] + "," + regs[2]
+                 instruction.append('srl')
+                 instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
+                 instruction.append('or')
+                 instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
                  repeticoes = 3
                  #converte ror em sll srl e or
             elif instruction[0] == pseudo_instructions[13]:
                 instruction[0] = 'srl'
                 regs = instruction[1].split(',')
                 instruction[1] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction[2] = 'sll'                        
-                instruction[3] = regs[0] + "," + regs[1] + "," + regs[2]
-                instruction[4] = 'or'                         
-                instruction[5] = regs[0] + "," + regs[1] + "," + regs[2]
+                instruction.append('sll')
+                instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
+                instruction.append('or')
+                instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
                 repeticoes = 3
                 #converte ror em srl sll e or
             elif instruction[0] == pseudo_instructions[14]:
@@ -305,10 +314,12 @@ rotulo["LOOP"] = 1
                  instruction[1] = regs[0] + ',$zero, -' + regs[1]
                  repeticoes = 1
         for i in range(0,repeticoes):
+            instruction[0+(i*2)] = "".join(instruction[0+(i*2)].split(' ')) #tira os espaços
+            instruction[1+(i*2)] = instruction[1+(i*2)].rstrip('\n')        #tira os \n's
             if instruction[0+(i*2)] in j_instructions:        #instruction[x] vai virar instruction[x+(i*2)]
                 #instrucao do tipo j
                 opcode = convertToBin(j_instructions[instruction[0+(i*2)]])
-                address = convertToBin(str(rotulo[instruction[1+(i*2)].rstrip('\n')])) #endereço é o rotulo convertido em texto binario
+                address = convertToBin(str(rotulo[instruction[1+(i*2)]])) #endereço é o rotulo convertido em texto binario
                 output += opcode.zfill(6) + address.zfill(26) #saida recebe strings com tamanhos fixos completados com 0
             elif instruction[0+(i*2)] in i_instructions:
                 #instrucao do tipo i
