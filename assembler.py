@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#-*-coding: utf-8-*-
 '''
 Esse programa foi desenvolvido pela dubpla: Victor Guerra Veloso(2658) e Athena Sarantôpoulos(2652).
 '''
