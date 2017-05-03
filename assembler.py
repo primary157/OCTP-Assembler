@@ -301,6 +301,7 @@ rotulo["LOOP"] = 1
                  regs = instruction[1].split(',')
                  instruction[1] = regs[0] + ',$zero, -' + regs[1]
                  repeticoes = 1
+                 #converte dec em addi
         for i in range(0,repeticoes):
             instruction[0+(i*2)] = "".join(instruction[0+(i*2)].split(' ')) #tira os espaços
             instruction[1+(i*2)] = instruction[1+(i*2)].rstrip('\n')        #tira os \n's
