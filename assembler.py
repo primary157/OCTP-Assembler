@@ -273,9 +273,9 @@ rotulo["LOOP"] = 1
            elif instruction[0] == pseudo_instructions[11]:
                   instruction[0] = 'nor'
                   regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + "," + regs[1] + ',$zero'
+                  instruction[1] = regs[0] + "," + regs[1].rstrip('\n')  + ',$zero'
                   repeticoes = 1
-                  #converte not em nor
+                 #converte not em nor
             elif instruction[0] == pseudo_instructions[12]:
                  instruction[0] = 'sll'
                  regs = instruction[1].split(',')
