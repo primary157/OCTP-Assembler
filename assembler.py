@@ -283,7 +283,7 @@ rotulo["LOOP"] = 1
                  instruction.append('srl')
                  instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
                  instruction.append('or')
-                 instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
+                 instruction.append(regs[0] + "," + regs[1] + "," + regs[1])
                  repeticoes = 3
                  #converte ror em sll srl e or
             elif instruction[0] == pseudo_instructions[13]:
@@ -293,9 +293,9 @@ rotulo["LOOP"] = 1
                 instruction.append('sll')
                 instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
                 instruction.append('or')
-                instruction.append(regs[0] + "," + regs[1] + "," + regs[2])
+                instruction.append(regs[0] + "," + regs[1] + "," + regs[1])
                 repeticoes = 3
-                #converte ror em srl sll e or
+                #converte rol em srl sll e or
             elif instruction[0] == pseudo_instructions[14]:
                  instruction[0] = 'addi'
                  regs = instruction[1].split(',')
