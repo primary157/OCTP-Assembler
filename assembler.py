@@ -270,11 +270,11 @@ rotulo["LOOP"] = 1
                  instruction[1] = regs[0] + ',$zero,' + regs[1]
                  repeticoes = 1
                  #converte neg em sub
-           elif instruction[0] == pseudo_instructions[11]:
-                  instruction[0] = 'nor'
-                  regs = instruction[1].split(',')
-                  instruction[1] = regs[0] + "," + regs[1].rstrip('\n')  + ',$zero'
-                  repeticoes = 1
+            elif instruction[0] == pseudo_instructions[11]:
+                 instruction[0] = 'nor'
+                 regs = instruction[1].split(',')
+                 instruction[1] = regs[0] + "," + regs[1].rstrip('\n')  + ',$zero'
+                 repeticoes = 1
                  #converte not em nor
             elif instruction[0] == pseudo_instructions[12]:
                  instruction[0] = 'sll'
