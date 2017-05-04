@@ -226,31 +226,31 @@ rotulo["LOOP"] = 1
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
-                instruction[2] = 'bne'
-                instruction[3] = '$t7,$zero,' + regs[2]
+                instruction.append('bne')
+                instruction.append('$t7,$zero,' + regs[2])
                 repeticoes = 2
                 #converte bgt em slt e bne
             elif instruction[0] == pseudo_instructions[5]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
-                instruction[2] = 'beq'
-                instruction[3] = '$t7,$zero,' + regs[2]
+                instruction.append('beq')
+                instruction.append('$t7,$zero,' + regs[2])
                 repeticoes = 2
                 #converte ble em slt e beq
             elif instruction[0] == pseudo_instructions[6]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
-                instruction[2] = 'beq'
-                instruction[3] = '$t7,$zero,'  + regs[2]
+                instruction.append('beq')
+                instruction.append('$t7,$zero,'  + regs[2])
                 #converte bge em slt e beq
             elif instruction[0] == pseudo_instructions[7]:
                 instruction[0] = 'slt'
                 regs = instruction[1].split(',')
                 instruction[1] = '$t7' + "," + regs[0] + "," + regs[1]
-                instruction[2] = 'beq'
-                instruction[3] = '$t7,$zero,' + regs[2]
+                instruction.append('beq')
+                instruction.append('$t7,$zero,' + regs[2])
                 repeticoes = 2
                 #converte sge em slt e beq
             elif instruction[0] == pseudo_instructions[8]:
